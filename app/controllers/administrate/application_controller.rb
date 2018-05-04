@@ -8,7 +8,7 @@ module Administrate
                                            dashboard_class,
                                            search_term).run
       resources = apply_resource_includes(resources)
-      resources = order.apply(resources)
+      resources = order.apply(resources)          
       resources = paginate(resources)
       page = Administrate::Page::Collection.new(dashboard, order: order)
 
@@ -83,8 +83,8 @@ module Administrate
         resources.page(params[:page]).per(records_per_page)
       elsif resources.page(params[:page]).klass.respond_to?(:paginate)
         resources.page(params[:page]).paginate(records_per_page)
-      else
-        resources # don't paginate if none are defined.
+      else        
+        super
       end
     end
 
