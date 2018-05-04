@@ -9,7 +9,7 @@ module Administrate
                                            search_term).run
       resources = apply_resource_includes(resources)
       resources = order.apply(resources)
-      resources = resources.page(params[:page]).per(records_per_page)
+      resources = paginate(resources)
       page = Administrate::Page::Collection.new(dashboard, order: order)
 
       render locals: {
@@ -76,6 +76,16 @@ module Administrate
         flash[:error] = requested_resource.errors.full_messages.join("<br/>")
       end
       redirect_to action: :index
+    end
+
+    def paginate(resources)
+      if resources.page(params[:page]).klass.respond_to?(:per)
+        resources.page(params[:page]).per(records_per_page)
+      elsif resources.page(params[:page]).klass.respond_to?(:paginate)
+        resources.page(params[:page]).paginate(records_per_page)
+      else
+        resources # don't paginate if none are defined.
+      end
     end
 
     private
